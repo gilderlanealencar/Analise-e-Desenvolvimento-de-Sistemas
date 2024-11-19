@@ -1,0 +1,130 @@
+class Disciplina:
+    def __init__(self, nome, professor):
+        self.nome = nome
+        self.professor = professor
+        self.alunos = {}  # Alunos matriculados e suas notas
+
+    def adicionar_aluno(self, aluno):
+        if aluno.nome not in self.alunos:
+            self.alunos[aluno.nome] = []
+
+    def registrar_nota(self, aluno, nota):
+        if aluno.nome in self.alunos:
+            self.alunos[aluno.nome].append(nota)
+        else:
+            print(f"Erro: Aluno {aluno.nome} não está matriculado na disciplina {self.nome}.")
+
+    def calcular_media(self, aluno):
+        if aluno.nome in self.alunos and self.alunos[aluno.nome]:
+            return sum(self.alunos[aluno.nome]) / len(self.alunos[aluno.nome])
+        return 0.0
+
+    def listar_alunos(self):
+        return list(self.alunos.keys())
+
+    def __str__(self):
+        return f"Disciplina: {self.nome}, Professor: {self.professor}, Alunos: {len(self.alunos)}"
+
+
+class Aluno:
+    def __init__(self, nome, idade):
+        self.nome = nome
+        self.idade = idade
+        self.disciplinas = []
+
+    def matricular(self, disciplina):
+        if disciplina not in self.disciplinas:
+            self.disciplinas.append(disciplina)
+            disciplina.adicionar_aluno(self)
+
+    def listar_disciplinas(self):
+        return [disciplina.nome for disciplina in self.disciplinas]
+
+    def __str__(self):
+        return f"Aluno: {self.nome}, Idade: {self.idade}, Disciplinas: {len(self.disciplinas)}"
+
+
+class SistemaEscolar:
+    def __init__(self):
+        self.disciplinas = []
+        self.alunos = []
+
+    def adicionar_disciplina(self, nome, professor):
+        nova_disciplina = Disciplina(nome, professor)
+        self.disciplinas.append(nova_disciplina)
+        print(f"Disciplina {nome} adicionada com sucesso.")
+
+    def listar_disciplinas(self):
+        for disciplina in self.disciplinas:
+            print(disciplina)
+
+    def adicionar_aluno(self, nome, idade):
+        novo_aluno = Aluno(nome, idade)
+        self.alunos.append(novo_aluno)
+        print(f"Aluno {nome} adicionado com sucesso.")
+
+    def listar_alunos(self):
+        for aluno in self.alunos:
+            print(aluno)
+
+    def matricular_aluno(self, aluno_nome, disciplina_nome):
+        aluno = next((a for a in self.alunos if a.nome == aluno_nome), None)
+        disciplina = next((d for d in self.disciplinas if d.nome == disciplina_nome), None)
+        if aluno and disciplina:
+            aluno.matricular(disciplina)
+            print(f"Aluno {aluno_nome} matriculado na disciplina {disciplina_nome}.")
+        else:
+            print("Erro: Aluno ou disciplina não encontrados.")
+
+    def registrar_nota(self, aluno_nome, disciplina_nome, nota):
+        aluno = next((a for a in self.alunos if a.nome == aluno_nome), None)
+        disciplina = next((d for d in self.disciplinas if d.nome == disciplina_nome), None)
+        if aluno and disciplina:
+            disciplina.registrar_nota(aluno, nota)
+            print(f"Nota {nota} registrada para {aluno_nome} em {disciplina_nome}.")
+        else:
+            print("Erro: Aluno ou disciplina não encontrados.")
+
+    def gerar_relatorio(self, disciplina_nome):
+        disciplina = next((d for d in self.disciplinas if d.nome == disciplina_nome), None)
+        if disciplina:
+            print(f"Relatório da disciplina: {disciplina_nome}")
+            for aluno_nome, notas in disciplina.alunos.items():
+                media = sum(notas) / len(notas) if notas else 0
+                print(f"Aluno: {aluno_nome}, Notas: {notas}, Média: {media:.2f}")
+        else:
+            print("Erro: Disciplina não encontrada.")
+
+
+# Testando o sistema
+if __name__ == "__main__":
+    sistema = SistemaEscolar()
+
+    # Adicionando disciplinas
+    sistema.adicionar_disciplina("Matemática", "Prof. João")
+    sistema.adicionar_disciplina("História", "Prof. Ana")
+
+    # Adicionando alunos
+    sistema.adicionar_aluno("Carlos", 16)
+    sistema.adicionar_aluno("Mariana", 17)
+
+    # Matriculando alunos
+    sistema.matricular_aluno("Carlos", "Matemática")
+    sistema.matricular_aluno("Carlos", "História")
+    sistema.matricular_aluno("Mariana", "História")
+
+    # Registrando notas
+    sistema.registrar_nota("Carlos", "Matemática", 8.5)
+    sistema.registrar_nota("Carlos", "História", 7.0)
+    sistema.registrar_nota("Mariana", "História", 9.0)
+
+    # Gerando relatórios
+    sistema.gerar_relatorio("História")
+    sistema.gerar_relatorio("Matemática")
+
+    # Listando informações
+    print("\n--- Lista de Disciplinas ---")
+    sistema.listar_disciplinas()
+
+    print("\n--- Lista de Alunos ---")
+    sistema.listar_alunos()
